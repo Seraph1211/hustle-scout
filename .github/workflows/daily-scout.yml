@@ -1,0 +1,40 @@
+name: Daily Hustle Scout
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # 每天 9:00 UTC
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install anthropic requests
+
+      - name: Run scraper
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+          SMTP_AUTH_CODE: ${{ secrets.SMTP_AUTH_CODE }}
+        run: python src/scraper.py
+
+      - name: Commit report
+        run: |
+          git config --local user.email "hustle-scout@github.com"
+          git config --local user.name "Hustle Scout Bot"
+          git add reports/
+          git diff --staged --quiet || git commit -m "docs: add daily report $(date +%Y-%m-%d)"
+
+      - name: Push report
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
