@@ -22,7 +22,11 @@ def search_ai_projects():
     """通过 Claude WebSearch 搜索 AI 副业项目"""
     try:
         from anthropic import Anthropic
-        client = Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+
+        api_key = os.environ.get("ANTHROPIC_API_KEY")
+        base_url = os.environ.get("ANTHROPIC_BASE_URL", "https://api.minimaxi.com/anthropic")
+
+        client = Anthropic(api_key=api_key, base_url=base_url)
 
         response = client.beta.messages.create(
             model="claude-sonnet-4-6-20250514",

@@ -8,6 +8,8 @@ on:
 jobs:
   scout:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -22,8 +24,10 @@ jobs:
       - name: Run scraper
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BASE_URL: ${{ secrets.ANTHROPIC_BASE_URL }}
           SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
           SMTP_AUTH_CODE: ${{ secrets.SMTP_AUTH_CODE }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
         run: python src/scraper.py
 
       - name: Commit report
